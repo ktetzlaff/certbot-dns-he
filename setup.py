@@ -25,7 +25,7 @@ setup(
     description='Hurricane Electric DNS Authenticator plugin for Certbot',
     long_description=long_description,
     long_description_content_type='text/x-rst',
-    url='https://github.com/TSaaristo/certbot-dns-he',
+    url='https://github.com/ejoelsso/certbot-dns-he/archive/v.1.1.0.tar.gz',
     author='TSaaristo',
     author_email='tero.saaristo@gmail.com',
     license='MIT',
