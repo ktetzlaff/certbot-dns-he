@@ -37,6 +37,20 @@ class Authenticator(dns_common.DNSAuthenticator):
         return 'This plugin configures a DNS TXT record to respond to a dns-01 challenge using ' + \
                'Hurricane Electric.'
 
+    def _get_he_target_domain(self, domain):
+        ''' Return HE DNS domain which matches domain (or None) '''
+        all_domains = self.dns_api.get_domains()
+        domain_parts = domain.split('.')
+        while domain_parts:
+            partial_domain = ".".join(domain_parts).lower()
+            target_domain = next((x for x in all_domains if x.name.lower() == partial_domain), None)
+            if target_domain is not None:
+                return target_domain
+
+            domain_parts.pop(0)
+
+        return None
+
     def _setup_credentials(self):
         self.credentials = self._configure_credentials(
             'credentials',
@@ -58,20 +72,7 @@ class Authenticator(dns_common.DNSAuthenticator):
         if not logged_in:
             raise errors.PluginError('Unable to authenticate to HE DNS')
 
-        # Fetch all domains and find the target by name
-        all_domains = self.dns_api.get_domains()
-        #Added while loop to match he.net hosted domains
-        #without the hostname or subdomain for the cert
-        partial_domain = domain.lower()
-        domain_parts_left = domain.count('.')
-
-        while domain_parts_left >= 1 :
-          target_domain = next((x for x in all_domains if x.name.lower() == partial_domain), None)
-          if target_domain:
-            break
-          partial_domain = partial_domain.split('.',1)[1]
-          domain_parts_left = partial_domain.count('.')
-
+        target_domain = self._get_he_target_domain(domain)
         if not target_domain:
             raise errors.PluginError('Unable to find domain: {0}'.format(domain))
 
@@ -97,20 +98,7 @@ class Authenticator(dns_common.DNSAuthenticator):
         if not logged_in:
             raise errors.PluginError('Unable to authenticate to HE DNS')
 
-        # Fetch all domains and find the target by name
-        all_domains = self.dns_api.get_domains()
-        #Added while loop to match he.net hosted domains 
-        #without the hostname or subdomain for the cert
-        partial_domain = domain.lower()
-        domain_parts_left = domain.count('.')
-
-        while domain_parts_left >= 1 :
-          target_domain = next((x for x in all_domains if x.name.lower() == partial_domain), None)
-          if target_domain:
-            break
-          partial_domain = partial_domain.split('.',1)[1]
-          domain_parts_left = partial_domain.count('.')
-
+        target_domain = self._get_he_target_domain(domain)
         if not target_domain:
             raise errors.PluginError('Unable to find domain: {0}'.format(domain))
 
